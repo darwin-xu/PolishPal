@@ -1,0 +1,17 @@
+{
+  "name": "polishpal",
+  "version": "1.0.0",
+  "description": "This is the very beginning of a project intended to build a tool to help users polish and proofread their English writing, score it, and assist them in improving their writing skills.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node -e \"console.log('No tests yet')\"",
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "openai": "^5.3.0"
+  }
+}
