@@ -13,17 +13,20 @@ PolishPal is a Node.js web application that provides AI-powered text proofreadin
 
 ## Example
 
-**Input:** 
+**Input:**
+
 ```
 i wold no make same again mistak .
 ```
 
 **Output:**
+
 ```
 I would not make the same mistake again.
 ```
 
 **Analysis:**
+
 - `i` → `I` (capitalization)
 - `wold` → `would` (spelling)
 - `no` → `not` (grammar)
@@ -62,27 +65,32 @@ PolishPal/
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd PolishPal
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Create environment file:
+
 ```bash
 cp .env.example .env
 ```
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
 
 5. Open your browser and navigate to:
+
 ```
 http://localhost:3000
 ```
@@ -90,6 +98,7 @@ http://localhost:3000
 ### Production Deployment
 
 For production use:
+
 ```bash
 npm start
 ```
@@ -97,37 +106,42 @@ npm start
 ## API Endpoints
 
 ### POST /api/proofread
+
 Proofread text and get analysis.
 
 **Request:**
+
 ```json
 {
-  "text": "i wold no make same again mistak ."
+    "text": "i wold no make same again mistak ."
 }
 ```
 
 **Response:**
+
 ```json
 {
-  "original": "i wold no make same again mistak .",
-  "corrected": "I would not make the same mistake again.",
-  "analysis": [
-    {
-      "position": 0,
-      "original": "i",
-      "corrected": "I",
-      "type": "capitalization",
-      "suggestion": "Capitalize \"I\""
-    }
-  ],
-  "recordId": "1640995200000_abc123def"
+    "original": "i wold no make same again mistak .",
+    "corrected": "I would not make the same mistake again.",
+    "analysis": [
+        {
+            "position": 0,
+            "original": "i",
+            "corrected": "I",
+            "type": "capitalization",
+            "suggestion": "Capitalize \"I\""
+        }
+    ],
+    "recordId": "1640995200000_abc123def"
 }
 ```
 
 ### GET /api/records
+
 Get all proofreading records.
 
 ### GET /api/records/:id
+
 Get a specific record by ID.
 
 ## Technology Stack
@@ -141,6 +155,7 @@ Get a specific record by ID.
 ## Future Enhancements
 
 ### AI Integration
+
 Currently uses a mock proofreading service. To integrate with real AI:
 
 1. **OpenAI Integration**: Add OpenAI API calls in `proofreadingService.js`
@@ -148,13 +163,14 @@ Currently uses a mock proofreading service. To integrate with real AI:
 3. **Multiple AI Providers**: Compare results from different AI services
 
 ### Example AI Integration:
+
 ```javascript
 // In proofreadingService.js
 async proofreadText(text) {
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     messages: [{
-      role: "user", 
+      role: "user",
       content: `Proofread this text: "${text}"`
     }]
   });
@@ -163,11 +179,13 @@ async proofreadText(text) {
 ```
 
 ### Database Integration
+
 - Replace file-based storage with PostgreSQL/MongoDB
 - Add user authentication and personal records
 - Implement record search and filtering
 
 ### Advanced Features
+
 - **Bulk Processing**: Handle multiple texts at once
 - **Export Options**: PDF, Word document export
 - **Analytics Dashboard**: Writing improvement metrics
@@ -189,6 +207,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Deployment
 
 ### Cloudflare Workers
+
 As mentioned in the original concept, this can be adapted for Cloudflare Workers:
 
 1. Refactor Express app to use Cloudflare Workers APIs
@@ -196,6 +215,7 @@ As mentioned in the original concept, this can be adapted for Cloudflare Workers
 3. Integrate with Cloudflare AI for proofreading
 
 ### Other Platforms
+
 - **Vercel**: Easy deployment with `vercel` command
 - **Heroku**: Traditional cloud platform
 - **AWS Lambda**: Serverless deployment

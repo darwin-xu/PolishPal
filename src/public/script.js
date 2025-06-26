@@ -19,7 +19,7 @@ class PolishPal {
         refreshBtn.addEventListener('click', () => this.loadRecords());
 
         // Allow Enter + Ctrl/Cmd to submit
-        inputText.addEventListener('keydown', (e) => {
+        inputText.addEventListener('keydown', e => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 this.proofreadText();
             }
@@ -31,7 +31,7 @@ class PolishPal {
         const charCount = document.getElementById('char-count');
         const count = inputText.value.length;
         charCount.textContent = count;
-        
+
         // Change color as approaching limit
         if (count > 4500) {
             charCount.style.color = '#dc3545';
@@ -64,7 +64,7 @@ class PolishPal {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text }),
             });
 
             if (!response.ok) {
@@ -75,10 +75,11 @@ class PolishPal {
             const result = await response.json();
             this.displayResults(result);
             this.loadRecords(); // Refresh records after new proofreading
-
         } catch (error) {
             console.error('Proofreading error:', error);
-            this.showError(error.message || 'Failed to proofread text. Please try again.');
+            this.showError(
+                error.message || 'Failed to proofread text. Please try again.'
+            );
         } finally {
             this.setLoading(false);
         }
@@ -106,7 +107,8 @@ class PolishPal {
         container.innerHTML = '';
 
         if (!analysis || analysis.length === 0) {
-            container.innerHTML = '<p style="color: #28a745; font-weight: 600;">✓ No errors found! Your text looks great.</p>';
+            container.innerHTML =
+                '<p style="color: #28a745; font-weight: 600;">✓ No errors found! Your text looks great.</p>';
             return;
         }
 
@@ -143,7 +145,6 @@ class PolishPal {
 
             const records = await response.json();
             this.displayRecords(records);
-
         } catch (error) {
             console.error('Error loading records:', error);
             this.showError('Failed to load records.');
@@ -155,7 +156,8 @@ class PolishPal {
         recordsList.innerHTML = '';
 
         if (records.length === 0) {
-            recordsList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No records yet. Start proofreading some text!</p>';
+            recordsList.innerHTML =
+                '<p style="color: #666; text-align: center; padding: 20px;">No records yet. Start proofreading some text!</p>';
             return;
         }
 
@@ -170,10 +172,10 @@ class PolishPal {
 
             const meta = document.createElement('div');
             meta.className = 'record-meta';
-            
+
             const timestamp = new Date(record.timestamp).toLocaleString();
             const errorCount = record.analysis ? record.analysis.length : 0;
-            
+
             meta.innerHTML = `
                 <span>${errorCount} error${errorCount !== 1 ? 's' : ''} found</span>
                 <span>${timestamp}</span>
@@ -194,7 +196,7 @@ class PolishPal {
         this.displayResults({
             original: record.originalText,
             corrected: record.correctedText,
-            analysis: record.analysis
+            analysis: record.analysis,
         });
     }
 
@@ -226,7 +228,10 @@ class PolishPal {
 
         // Insert after the input section
         const inputSection = document.querySelector('.input-section');
-        inputSection.parentNode.insertBefore(errorDiv, inputSection.nextSibling);
+        inputSection.parentNode.insertBefore(
+            errorDiv,
+            inputSection.nextSibling
+        );
 
         // Auto remove after 5 seconds
         setTimeout(() => {
@@ -248,7 +253,10 @@ class PolishPal {
 
         // Insert after the input section
         const inputSection = document.querySelector('.input-section');
-        inputSection.parentNode.insertBefore(successDiv, inputSection.nextSibling);
+        inputSection.parentNode.insertBefore(
+            successDiv,
+            inputSection.nextSibling
+        );
 
         // Auto remove after 3 seconds
         setTimeout(() => {
