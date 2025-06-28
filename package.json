@@ -2,13 +2,9 @@
     "name": "polishpal",
     "version": "1.0.0",
     "description": "AI-powered text proofreading tool with word-by-word analysis",
-    "main": "src/app.js",
     "scripts": {
-        "start": "node src/app.js",
-        "dev": "nodemon src/app.js",
-        "build": "cp src/public/* . 2>/dev/null || true",
         "deploy": "wrangler pages deploy . --project-name=polishpal",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "wrangler pages dev .",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
     },
@@ -16,19 +12,12 @@
         "proofreading",
         "ai",
         "text-analysis",
-        "grammar"
+        "grammar",
+        "cloudflare-pages"
     ],
     "author": "",
     "license": "MIT",
-    "dependencies": {
-        "axios": "^1.6.0",
-        "cors": "^2.8.5",
-        "dotenv": "^16.3.1",
-        "express": "^4.18.2",
-        "helmet": "^7.1.0"
-    },
     "devDependencies": {
-        "nodemon": "^3.0.1",
         "prettier": "^3.6.1",
         "wrangler": "^3.0.0"
     }

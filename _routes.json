@@ -6,7 +6,6 @@
   "exclude": [
     "/index.html",
     "/script.js",
-    "/styles.css",
-    "/icons/*"
+    "/styles.css"
   ]
 }

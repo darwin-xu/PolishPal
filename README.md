@@ -7,7 +7,6 @@ PolishPal is a Node.js web application that provides AI-powered text proofreadin
 - **Real-time Text Proofreading**: Submit text and get instant corrections
 - **Word-by-Word Analysis**: Detailed breakdown of errors with categorization
 - **Error Types**: Identifies spelling, grammar, capitalization, missing words, and extra words
-- **Record Keeping**: Saves all proofreading sessions for future reference
 - **Modern UI**: Clean, responsive interface with gradient design
 - **Character Limit**: Supports up to 5,000 characters per submission
 
@@ -43,13 +42,11 @@ PolishPal/
 │   ├── routes/
 │   │   └── proofreading.js    # API routes
 │   ├── services/
-│   │   ├── proofreadingService.js  # Core proofreading logic
-│   │   └── recordService.js        # Record management
+│   │   └── proofreadingService.js  # Core proofreading logic
 │   └── public/
 │       ├── index.html         # Main web interface
 │       ├── styles.css         # Styling
 │       └── script.js          # Frontend JavaScript
-├── records/                   # JSON files for storing records
 ├── package.json
 ├── .env.example
 └── README.md
@@ -131,24 +128,14 @@ Proofread text and get analysis.
             "type": "capitalization",
             "suggestion": "Capitalize \"I\""
         }
-    ],
-    "recordId": "1640995200000_abc123def"
+    ]
 }
 ```
-
-### GET /api/records
-
-Get all proofreading records.
-
-### GET /api/records/:id
-
-Get a specific record by ID.
 
 ## Technology Stack
 
 - **Backend**: Node.js, Express.js
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
-- **Storage**: File-based JSON records
 - **Security**: Helmet.js for security headers
 - **Styling**: Modern CSS with gradients and animations
 
@@ -180,9 +167,8 @@ async proofreadText(text) {
 
 ### Database Integration
 
-- Replace file-based storage with PostgreSQL/MongoDB
-- Add user authentication and personal records
-- Implement record search and filtering
+- Replace file storage with a database like PostgreSQL/MongoDB
+- Add user authentication and personal data storage
 
 ### Advanced Features
 
@@ -211,8 +197,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 As mentioned in the original concept, this can be adapted for Cloudflare Workers:
 
 1. Refactor Express app to use Cloudflare Workers APIs
-2. Use Cloudflare KV for record storage
-3. Integrate with Cloudflare AI for proofreading
+2. Integrate with Cloudflare AI for proofreading
 
 ### Other Platforms
 

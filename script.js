@@ -5,18 +5,15 @@ class PolishPal {
 
     init() {
         this.bindEvents();
-        this.loadRecords();
         this.updateCharCount();
     }
 
     bindEvents() {
         const inputText = document.getElementById('input-text');
         const proofreadBtn = document.getElementById('proofread-btn');
-        const refreshBtn = document.getElementById('refresh-records');
 
         inputText.addEventListener('input', () => this.updateCharCount());
         proofreadBtn.addEventListener('click', () => this.proofreadText());
-        refreshBtn.addEventListener('click', () => this.loadRecords());
 
         // Allow Enter + Ctrl/Cmd to submit
         inputText.addEventListener('keydown', e => {
@@ -74,7 +71,6 @@ class PolishPal {
 
             const result = await response.json();
             this.displayResults(result);
-            this.loadRecords(); // Refresh records after new proofreading
         } catch (error) {
             console.error('Proofreading error:', error);
             this.showError(
@@ -133,70 +129,6 @@ class PolishPal {
             errorItem.appendChild(errorType);
             errorItem.appendChild(errorSuggestion);
             container.appendChild(errorItem);
-        });
-    }
-
-    async loadRecords() {
-        try {
-            const response = await fetch('/api/records');
-            if (!response.ok) {
-                throw new Error('Failed to load records');
-            }
-
-            const records = await response.json();
-            this.displayRecords(records);
-        } catch (error) {
-            console.error('Error loading records:', error);
-            this.showError('Failed to load records.');
-        }
-    }
-
-    displayRecords(records) {
-        const recordsList = document.getElementById('records-list');
-        recordsList.innerHTML = '';
-
-        if (records.length === 0) {
-            recordsList.innerHTML =
-                '<p style="color: #666; text-align: center; padding: 20px;">No records yet. Start proofreading some text!</p>';
-            return;
-        }
-
-        records.slice(0, 10).forEach(record => {
-            const recordItem = document.createElement('div');
-            recordItem.className = 'record-item';
-            recordItem.onclick = () => this.showRecordDetails(record);
-
-            const preview = document.createElement('div');
-            preview.className = 'record-preview';
-            preview.textContent = record.originalText;
-
-            const meta = document.createElement('div');
-            meta.className = 'record-meta';
-
-            const timestamp = new Date(record.timestamp).toLocaleString();
-            const errorCount = record.analysis ? record.analysis.length : 0;
-
-            meta.innerHTML = `
-                <span>${errorCount} error${errorCount !== 1 ? 's' : ''} found</span>
-                <span>${timestamp}</span>
-            `;
-
-            recordItem.appendChild(preview);
-            recordItem.appendChild(meta);
-            recordsList.appendChild(recordItem);
-        });
-    }
-
-    showRecordDetails(record) {
-        // Fill the input with the original text
-        document.getElementById('input-text').value = record.originalText;
-        this.updateCharCount();
-
-        // Display the results
-        this.displayResults({
-            original: record.originalText,
-            corrected: record.correctedText,
-            analysis: record.analysis,
         });
     }
 
