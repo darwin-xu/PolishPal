@@ -6,6 +6,8 @@
     "scripts": {
         "start": "node src/app.js",
         "dev": "nodemon src/app.js",
+        "build": "cp src/public/* . 2>/dev/null || true",
+        "deploy": "wrangler pages deploy . --project-name=polishpal",
         "test": "echo \"Error: no test specified\" && exit 1",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
@@ -27,6 +29,7 @@
     },
     "devDependencies": {
         "nodemon": "^3.0.1",
-        "prettier": "^3.6.1"
+        "prettier": "^3.6.1",
+        "wrangler": "^3.0.0"
     }
 }
