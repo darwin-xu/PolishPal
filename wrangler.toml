@@ -1,16 +1,6 @@
 name = "polishpal"
 compatibility_date = "2024-01-01"
-compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "."
 
-[build]
-command = "npm run build"
-cwd = "."
-
-[build.environment]
-NODE_VERSION = "18"
-
-[[functions]]
-directory = "functions"
-
-[vars]
+[env.production.vars]
 NODE_ENV = "production"
