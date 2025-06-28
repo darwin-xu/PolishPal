@@ -43,6 +43,40 @@ Thumbs.db
 *.swo
 *~
 
+# Cloudflare Workers/Pages
+.wrangler/
+wrangler.toml.bak
+dist/
+build/
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-store/
+
+# Testing
+.nyc_output/
+coverage/
+*.lcov
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Editor-specific
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+
+# Prettier
+.prettierrc.local
+.prettierignore.local
+
 # Records (development)
 # Uncomment the next line if you don't want to track records in git
 # records/
