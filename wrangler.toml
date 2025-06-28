@@ -1,6 +1,10 @@
 name = "polishpal"
+main = "src/index.js"
 compatibility_date = "2024-01-01"
-pages_build_output_dir = "."
 
-[env.production.vars]
+[vars]
 NODE_ENV = "production"
+
+# Environment variables - set these using: wrangler secret put OPENAI_API_KEY
+# [env.production]
+# vars = { NODE_ENV = "production" }

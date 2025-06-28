@@ -1,6 +1,6 @@
 # PolishPal - AI Text Proofreading Tool
 
-PolishPal is a Node.js web application that provides AI-powered text proofreading with detailed word-by-word analysis. It helps users improve their writing by identifying errors and providing corrections with explanations.
+PolishPal is a Cloudflare Worker application that provides AI-powered text proofreading with detailed word-by-word analysis. It helps users improve their writing by identifying errors and providing corrections with explanations.
 
 ## Features
 
@@ -9,6 +9,7 @@ PolishPal is a Node.js web application that provides AI-powered text proofreadin
 - **Error Types**: Identifies spelling, grammar, capitalization, missing words, and extra words
 - **Modern UI**: Clean, responsive interface with gradient design
 - **Character Limit**: Supports up to 5,000 characters per submission
+- **Edge Computing**: Runs on Cloudflare's global network for fast response times
 
 ## Example
 
@@ -38,16 +39,10 @@ I would not make the same mistake again.
 ```
 PolishPal/
 ├── src/
-│   ├── app.js                 # Main Express server
-│   ├── routes/
-│   │   └── proofreading.js    # API routes
-│   ├── services/
-│   │   └── proofreadingService.js  # Core proofreading logic
-│   └── public/
-│       ├── index.html         # Main web interface
-│       ├── styles.css         # Styling
-│       └── script.js          # Frontend JavaScript
-├── package.json
+│   └── index.js               # Main Cloudflare Worker
+├── wrangler.toml              # Worker configuration
+├── package.json               # Dependencies and scripts
+├── migrate.sh                 # Migration script from Pages to Workers
 ├── .env.example
 └── README.md
 ```
@@ -74,10 +69,10 @@ cd PolishPal
 npm install
 ```
 
-3. Create environment file:
+3. Set up your OpenAI API key:
 
 ```bash
-cp .env.example .env
+wrangler secret put OPENAI_API_KEY
 ```
 
 4. Start the development server:
@@ -89,15 +84,31 @@ npm run dev
 5. Open your browser and navigate to:
 
 ```
-http://localhost:3000
+http://localhost:8787
 ```
 
 ### Production Deployment
 
-For production use:
+Deploy to Cloudflare Workers:
 
 ```bash
-npm start
+npm run deploy
+```
+
+## Migration from Pages to Workers
+
+If you're migrating from the previous Cloudflare Pages version:
+
+1. Run the migration script:
+
+```bash
+./migrate.sh
+```
+
+2. Set up your OpenAI API key as a Worker secret:
+
+```bash
+wrangler secret put OPENAI_API_KEY
 ```
 
 ## API Endpoints
