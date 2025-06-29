@@ -191,6 +191,7 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>PolishPal - AI Text Proofreading</title>
+        <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
         <style>
             /* Embedded CSS - in production, load from KV or external resource */
             * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -208,6 +209,12 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
             .copy-btn:active { background: #1e7e34; }
             .copy-btn.copied { background: #17a2b8; }
             .text-display { background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea; margin: 1rem 0; }
+            .diff-container { background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea; margin: 1rem 0; font-family: 'Courier New', monospace; }
+            .diff-added { background-color: #d4edda; color: #155724; padding: 2px 4px; border-radius: 3px; }
+            .diff-removed { background-color: #f8d7da; color: #721c24; padding: 2px 4px; border-radius: 3px; text-decoration: line-through; }
+            .diff-unchanged { color: #6c757d; }
+            .analysis-summary { margin-bottom: 1rem; padding: 1rem; background: #e9ecef; border-radius: 6px; }
+            .change-count { font-weight: bold; color: #495057; }
             .error-message { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 6px; border-left: 4px solid #dc3545; }
         </style>
     </head>
@@ -320,15 +327,57 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
                     document.getElementById('corrected-text').textContent = data.corrected;
                     
                     const analysisDiv = document.getElementById('analysis-results');
-                    if (data.analysis && data.analysis.length > 0) {
-                        analysisDiv.innerHTML = data.analysis.map(item => 
-                            '<div class="analysis-item">' + item.suggestion + '</div>'
-                        ).join('');
+                    
+                    // Use jsdiff to show detailed changes
+                    if (typeof Diff !== 'undefined' && data.original && data.corrected) {
+                        const diff = Diff.diffWords(data.original, data.corrected);
+                        const diffHtml = this.generateDiffHtml(diff);
+                        
+                        // Count changes
+                        const changes = diff.filter(part => part.added || part.removed);
+                        const addedCount = diff.filter(part => part.added).length;
+                        const removedCount = diff.filter(part => part.removed).length;
+                        
+                        let summaryHtml = '';
+                        if (changes.length > 0) {
+                            summaryHtml = 
+                                '<div class="analysis-summary">' +
+                                    '<div class="change-count">Changes made: ' + changes.length + ' modification(s)</div>' +
+                                    '<div>Added: ' + addedCount + ' &bull; Removed: ' + removedCount + '</div>' +
+                                '</div>';
+                        }
+                        
+                        analysisDiv.innerHTML = summaryHtml + '<div class="diff-container">' + diffHtml + '</div>';
                     } else {
-                        analysisDiv.innerHTML = '<div class="no-errors">No errors found!</div>';
+                        // Fallback to original analysis if jsdiff is not available
+                        if (data.analysis && data.analysis.length > 0) {
+                            analysisDiv.innerHTML = data.analysis.map(item => 
+                                '<div class="analysis-item">' + item.suggestion + '</div>'
+                            ).join('');
+                        } else {
+                            analysisDiv.innerHTML = '<div class="no-errors">No errors found!</div>';
+                        }
                     }
                     
                     document.getElementById('results-section').style.display = 'block';
+                }
+
+                generateDiffHtml(diff) {
+                    return diff.map(part => {
+                        if (part.added) {
+                            return '<span class="diff-added">' + this.escapeHtml(part.value) + '</span>';
+                        } else if (part.removed) {
+                            return '<span class="diff-removed">' + this.escapeHtml(part.value) + '</span>';
+                        } else {
+                            return '<span class="diff-unchanged">' + this.escapeHtml(part.value) + '</span>';
+                        }
+                    }).join('');
+                }
+
+                escapeHtml(text) {
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
                 }
 
                 async copyToClipboard() {
