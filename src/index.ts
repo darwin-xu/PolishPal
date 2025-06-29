@@ -2,17 +2,35 @@
  * Cloudflare Worker for PolishPal - AI-powered text proofreading
  */
 
+interface Env {
+    OPENAI_API_KEY: string;
+}
+
+interface ProofreadResult {
+    correctedText: string;
+}
+
+interface AnalysisItem {
+    position: number;
+    original: string;
+    corrected: string;
+    type: string;
+    suggestion: string;
+}
+
+declare const ExecutionContext: any;
+
 class ProofreadingService {
-    constructor(env) {
+    private env: Env;
+
+    constructor(env: Env) {
         this.env = env;
     }
 
     /**
      * Proofread text using OpenAI API
-     * @param {string} text - Original text to proofread
-     * @returns {Promise<{correctedText: string}>}
      */
-    async proofreadText(text) {
+    async proofreadText(text: string): Promise<ProofreadResult> {
         if (!this.env?.OPENAI_API_KEY) {
             throw new Error('OpenAI API key not configured');
         }
@@ -51,33 +69,30 @@ class ProofreadingService {
             );
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
+                const errorData = await response.json().catch(() => ({})) as any;
                 throw new Error(
                     `OpenAI API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`
                 );
             }
 
-            const data = await response.json();
+            const data = await response.json() as any;
             const correctedText =
                 data.choices?.[0]?.message?.content?.trim() || text;
 
             return { correctedText };
         } catch (error) {
             console.error('OpenAI API error:', error);
-            throw new Error(`Failed to proofread text: ${error.message}`);
+            throw new Error(`Failed to proofread text: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 
     /**
      * Analyze changes between original and corrected text
-     * @param {string} original
-     * @param {string} corrected
-     * @returns {Array<{word: string, type: string, suggestion: string, position: number}>}
      */
-    analyzeChanges(original, corrected) {
+    analyzeChanges(original: string, corrected: string): AnalysisItem[] {
         const originalWords = original.toLowerCase().split(/\s+/);
         const correctedWords = corrected.toLowerCase().split(/\s+/);
-        const analysis = [];
+        const analysis: AnalysisItem[] = [];
 
         // Simple word-by-word comparison
         const maxLength = Math.max(originalWords.length, correctedWords.length);
@@ -123,11 +138,8 @@ class ProofreadingService {
 
     /**
      * Check if the difference is likely a spelling error
-     * @param {string} word1
-     * @param {string} word2
-     * @returns {boolean}
      */
-    isSpellingError(word1, word2) {
+    isSpellingError(word1: string, word2: string): boolean {
         if (!word1 || !word2) return false;
 
         // Simple heuristic: if words are similar length and have common characters
@@ -150,7 +162,7 @@ class ProofreadingService {
 /**
  * Static file handler - serves HTML, CSS, JS files
  */
-async function handleStaticFile(request, pathname) {
+async function handleStaticFile(request: Request, pathname: string): Promise<Response> {
     // Default to index.html for root path
     if (pathname === '/' || pathname === '') {
         pathname = '/index.html';
@@ -351,7 +363,7 @@ async function handleStaticFile(request, pathname) {
  * Main Worker fetch handler
  */
 export default {
-    async fetch(request, env, ctx) {
+    async fetch(request: Request, env: Env, ctx: any): Promise<Response> {
         const url = new URL(request.url);
         const pathname = url.pathname;
 
@@ -388,7 +400,7 @@ export default {
                 }
 
                 try {
-                    const { text } = await request.json();
+                    const { text } = await request.json() as { text: string };
 
                     if (!text || typeof text !== 'string') {
                         return new Response(
@@ -451,11 +463,11 @@ export default {
                     let statusCode = 500;
 
                     if (
-                        error.message.includes('OpenAI API key not configured')
+                        error instanceof Error && error.message.includes('OpenAI API key not configured')
                     ) {
                         errorMessage = 'Service temporarily unavailable';
                         statusCode = 503;
-                    } else if (error.message.includes('OpenAI API error')) {
+                    } else if (error instanceof Error && error.message.includes('OpenAI API error')) {
                         errorMessage = 'AI service error';
                         statusCode = 502;
                     }
