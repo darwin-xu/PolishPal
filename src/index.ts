@@ -202,6 +202,11 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
             textarea { width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem; resize: vertical; font-family: inherit; }
             .primary-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
             .results-section { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 10px #00000010; }
+            .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+            .copy-btn { background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; transition: background-color 0.2s; }
+            .copy-btn:hover { background: #218838; }
+            .copy-btn:active { background: #1e7e34; }
+            .copy-btn.copied { background: #17a2b8; }
             .text-display { background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea; margin: 1rem 0; }
             .error-message { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 6px; border-left: 4px solid #dc3545; }
         </style>
@@ -230,11 +235,10 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
 
                 <section id="results-section" class="results-section" style="display: none">
                     <div class="result-card">
-                        <h3>Original Text:</h3>
-                        <div id="original-text" class="text-display"></div>
-                    </div>
-                    <div class="result-card">
-                        <h3>Corrected Text:</h3>
+                        <div class="result-header">
+                            <h3>Corrected Text:</h3>
+                            <button id="copy-btn" class="copy-btn" title="Copy to clipboard">📋 Copy</button>
+                        </div>
                         <div id="corrected-text" class="text-display"></div>
                     </div>
                     <div class="result-card">
@@ -263,8 +267,11 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
                 bindEvents() {
                     const inputText = document.getElementById('input-text');
                     const proofreadBtn = document.getElementById('proofread-btn');
+                    const copyBtn = document.getElementById('copy-btn');
+                    
                     inputText.addEventListener('input', () => this.updateCharCount());
                     proofreadBtn.addEventListener('click', () => this.proofreadText());
+                    copyBtn.addEventListener('click', () => this.copyToClipboard());
                 }
 
                 updateCharCount() {
@@ -310,7 +317,6 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
                 }
 
                 displayResults(data) {
-                    document.getElementById('original-text').textContent = data.original;
                     document.getElementById('corrected-text').textContent = data.corrected;
                     
                     const analysisDiv = document.getElementById('analysis-results');
@@ -323,6 +329,57 @@ async function handleStaticFile(request: Request, pathname: string): Promise<Res
                     }
                     
                     document.getElementById('results-section').style.display = 'block';
+                }
+
+                async copyToClipboard() {
+                    const correctedText = document.getElementById('corrected-text').textContent;
+                    const copyBtn = document.getElementById('copy-btn');
+                    
+                    if (!correctedText) {
+                        return;
+                    }
+
+                    try {
+                        await navigator.clipboard.writeText(correctedText);
+                        
+                        // Show feedback
+                        const originalText = copyBtn.textContent;
+                        copyBtn.textContent = '✓ Copied!';
+                        copyBtn.classList.add('copied');
+                        
+                        // Reset after 2 seconds
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    } catch (error) {
+                        // Fallback for older browsers
+                        this.fallbackCopyToClipboard(correctedText);
+                    }
+                }
+
+                fallbackCopyToClipboard(text) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        const copyBtn = document.getElementById('copy-btn');
+                        const originalText = copyBtn.textContent;
+                        copyBtn.textContent = '✓ Copied!';
+                        copyBtn.classList.add('copied');
+                        
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    } catch (error) {
+                        console.error('Copy failed:', error);
+                    }
+                    
+                    document.body.removeChild(textArea);
                 }
 
                 showError(message) {
