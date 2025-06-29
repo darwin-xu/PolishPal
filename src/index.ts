@@ -3,7 +3,8 @@
  */
 
 interface Env {
-    OPENAI_API_KEY: string;
+    OPENAI_TOKEN: string;
+    ENVIRONMENT?: string;
 }
 
 interface ProofreadResult {
@@ -20,6 +21,13 @@ interface AnalysisItem {
 
 declare const ExecutionContext: any;
 
+function getApiEndpoints(env: Env): string {
+    const isLocal = env.ENVIRONMENT === 'development';
+    console.log('isLocal:', isLocal);
+
+    return isLocal ? 'http://35.234.22.51:8080' : 'https://api.openai.com';
+}
+
 class ProofreadingService {
     private env: Env;
 
@@ -31,9 +39,10 @@ class ProofreadingService {
      * Proofread text using OpenAI API
      */
     async proofreadText(text: string): Promise<ProofreadResult> {
-        if (!this.env?.OPENAI_API_KEY) {
+        if (!this.env?.OPENAI_TOKEN) {
             throw new Error('OpenAI API key not configured');
         }
+        console.log('openai_token:', this.env?.OPENAI_TOKEN);
 
         const prompt =
             `Please proofread and correct the following text. Fix grammar, spelling, punctuation, ` +
@@ -42,11 +51,11 @@ class ProofreadingService {
 
         try {
             const response = await fetch(
-                'http://35.234.22.51:8080/v1/chat/completions',
+                `${getApiEndpoints(this.env)}/v1/chat/completions`,
                 {
                     method: 'POST',
                     headers: {
-                        Authorization: `Bearer ${this.env.OPENAI_API_KEY}`,
+                        Authorization: `Bearer ${this.env.OPENAI_TOKEN}`,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
